@@ -64,6 +64,63 @@ def fix_format_date(date):
 
 
 
+def standarize_activities(activity):
+    """
+    Function to standarize the activities in the 'activity' column of the DataFrame.
+    The activities that are not in the list are replaced with 'other'.
+    """
+
+    #Dictionary with the activities to be replaced
+    activity_mapping = {
+    'Surfing': ['Surfing', 'Body surfing', 'Surfng', 'Surfing ', 'Body Surfing', 'Bodysurfing', 
+                'Surf skiing', 'Tandem surfing', 'Standing / Surfing', 'Surfing amid a shoal of sharks'],
+    
+    'Fishing': ['Fishing', 'Kayak fishing', 'Fishing ', 'Fishing for sharks', 'Fishing, fell in water', 
+                'Fishing for blue sharks', 'Shark Fishing', 'Wade fishing', 'Wade Fishing',
+                'Fishing from a kayak', 'Fishing for whiting', 'Fishing (illegally)', 'Fishing from prawn trawler'],
+    
+    'Spearfishing': ['Spearfishing', 'Spearishing', 'Spearfishing / Diving', 'Spearfishing / Free diving',
+                     'Free diving / spearfishing', 'Spearfishing (free diving)', 'Spearfishing (Free diving)',
+                     'Spearfishing, holding mesh bag with speared fish'],
+    
+    'Diving': ['Diving', 'Scuba diving', 'Diving for crayfish', 'Diving with surface-supplied air', 
+               'Surface Supplied Diving', 'Diving for Abalone', 'Diving for sea urchins', 
+               'Diving for beche-de-mer', 'Diving in shark tank', 'Diving, feeding sharks', 
+               'Diving in aquarium display tank', 'Diving, but on the surface when bitten by the shark', 
+               'SCUBA Diving', 'Free diving', 'Free diving '],
+    
+    'Windsurfing': ['Windsurfing', 'Wing Foil Surfing', 'Kite surfing', 'Kite Surfing', 
+                    'Kite-Boarding', 'Kite Boarding'],
+    
+    'Snorkeling': ['Snorkeling', 'Swimming or Snorkeling', 'Swimming / snorkeling', 'Snorkeling (filming the sardine run)'],
+    
+    'Swimming': ['Swimming', 'Swimmingq', 'Lifeguard Training Exercise', 'Lifeguard Exercises', 
+                 'Playing in the water', 'Playing', 'Wading', 'Swimming / Kayaking', 'Swimming after being swept off rocks',
+                 'Swimming with sharks', 'Swimming/Standing', 'Swimming / Wading', 'Swimming or boogie boarding',
+                 'Swimming, poaching abalone', 'Swimming, poaching perlemoen', 'Swimming after falling overboard',
+                 'Swimming, attempting to rescue a girl believed to be drowning', 'Swimming back from anchored sailboat',
+                 'Swimming /  Whale Watching', 'Swimming / treading water', 'Swimming to shore from boat or kayak', 
+                 'Swimming to shore with flotation devices after boat engine conked out', 'Swimming / Body surfing',
+                 'Swimming/standing', 'Standing', 'Treading water', 'Sitting in the water'],
+    
+    'Kayaking': ['Kayaking', 'Kayaking ', 'Kayak Fishing', 'Kayaking / Fishing', 'Kayaking fishing', 
+                 'Kayaking (returning from spearfishing)'],
+    
+    'Paddleboarding': ['Paddleboarding', 'Stand-Up Paddle boarding', 'Paddle Boarding', 'Stand-Up Paddleboarding', 
+                       'SUP Foil boarding', 'SUP', 'Paddle-surfing']
+    }
+    
+    # Check if the activity is in the list of activities to be replaced
+    for standarized, variations in activity_mapping.items():
+        # If it is, return the standarized version
+        if activity in variations:
+            return standarized 
+    else:
+        return activity
+ 
+
+
+
 def filter_date(df):
     """
     This function filters the DataFrame to include only attacks after 2000-01-01.
@@ -273,5 +330,41 @@ def plot_top_states(df_filtered):
     plt.xlabel('State/Province')
     plt.ylabel('Number of Attacks')
     plt.title('Top 10 States/Provinces with Most Shark Attacks (From 2020)')
+    plt.tight_layout()
+    return plt.show()
+
+
+
+def plot_attacks_per_month_USA (df_filtered):
+    """
+    Funtion that groups attacks in the United States
+    by month and generates a bar graph.
+    Parameters: the filtered DataFrame
+    """
+    # Filter the data to only include attacks in the United States
+    df_filtered = df_filtered[df_filtered['country'] == 'USA']
+
+    # Extract the month from the 'date' column
+    df['month'] = df_filtered['date'].dt.month
+
+    # Group by month and count attacks
+    attacks_per_month = df.groupby('month').size().reset_index(name='count')
+
+    # Create a bar chart of attacks by month
+    plt.figure(figsize=(14, 8))
+    bars = plt.bar(attacks_per_month['month'], attacks_per_month['count'], color='lightblue')
+
+    # Add the numbers inside the bars
+    for bar in bars:
+        yval = bar.get_height()
+        plt.text(bar.get_x() + bar.get_width() / 2, yval, int(yval), va='bottom', ha='center', color='black')
+
+    # Chart settings
+    plt.xlabel('Month')
+    plt.ylabel('Number of Attacks')
+    plt.title('Total Number of Shark Attacks by Month in the USA (From 2000)')
+    plt.xticks(range(1, 13), ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'])
+
+    # Mostrar el gráfico
     plt.tight_layout()
     return plt.show()
